@@ -1,3 +1,5 @@
+
+
 /* ============================================================================
 																Explorer Mode
  ============================================================================ */
@@ -11,6 +13,20 @@
  * result in true.
  */
 function validateGameType(gameTypeString) {
+	// TODO just having an if typeOf statement breaks this function and it makes NO SENSE!
+	if (typeof gameTypeString === 'string') {
+		if (gameTypeString === '1' || gameTypeString.toLowerCase() === 'one') {
+			return 1;
+		} else if (gameTypeString === '2' || gameTypeString.toLowerCase() === 'two') {
+			return 2;
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
+	// 	// return false;
+	// }
 
 }
 
@@ -19,15 +35,27 @@ function validateGameType(gameTypeString) {
  * letters, hyphens or spaces and must contain at least one letter. Returns
  * false if the name is not valid.
  */
-function validateName(name) {
 
+function validateName(name) {
+	if (/^[a-zA-Z-'\s]+$/.test(name) && /^[a-zA-Z]+$/.test(name)) {
+		return name;
+	} else {
+		return false;
+	}
 }
 
 /*
  * Randomly generates and returns a name for a computer player.
  */
 function generateComputerName() {
+	var computerName = "";
+  var possibleCharacters = "abcdefghijklmnopqrstuvwxyz";
+	var randomLength = Math.ceil(Math.random*10 + 1);
 
+  for(var i=0; i < 5; i++ ) {
+		computerName += possibleCharacters.charAt(Math.floor(Math.random() * possibleCharacters.length));
+	}
+	return computerName;
 }
 
 /*
@@ -38,7 +66,13 @@ function generateComputerName() {
  * insensitive, so it should accept both 'Y' and 'y' for example.
  */
 function validateYesNo(yesNoString) {
-
+	if (yesNoString.toLowerCase() === 'y' || yesNoString.toLowerCase() === 'yes') {
+		return true;
+	} else if (yesNoString.toLowerCase() === 'n' || yesNoString.toLowerCase() === 'no') {
+		return false;
+	} else {
+		return null;
+	}
 }
 
 /*
@@ -47,7 +81,11 @@ function validateYesNo(yesNoString) {
  * 'O' and vice versa.
  */
 function getNextPlayer(currentPlayer) {
-
+	if (currentPlayer === 'X') {
+		return 'O';
+	} else {
+		return 'X';
+	}
 }
 
 /*
@@ -69,7 +107,7 @@ function getNextPlayer(currentPlayer) {
  *   ~~~~~~~~~~~~~
  */
 function getGameBoardString(gameBoard) {
-
+	return '     1   2   3 \n  ~~~~~~~~~~~~~\n1 | ' + gameBoard[0][0] + ' | ' + gameBoard[0][1] + ' | ' + gameBoard[0][2] + ' |\n  ~~~~~~~~~~~~~\n2 | ' + gameBoard[1][0] + ' | ' + gameBoard[1][1] + ' | ' + gameBoard[1][2] + ' |\n  ~~~~~~~~~~~~~\n3 | ' + gameBoard[2][0] + ' | ' + gameBoard[2][1] + ' | ' + gameBoard[2][2] + ' |\n  ~~~~~~~~~~~~~\n';
 }
 
 /*
@@ -78,7 +116,15 @@ function getGameBoardString(gameBoard) {
  * For example, the game board might be 3x3, 4x4, or 5x7.
  */
 function getEmptySpaceCount(gameBoard) {
-
+	var emptySpaces = 0;
+	for (var i = 0; i < gameBoard.length; i++) {
+		for (var space = 0; space < gameBoard[i].length; space++) {
+			if (gameBoard[i][space] === ' ') {
+				emptySpaces++;
+			}
+		}
+  }
+	return emptySpaces;
 }
 
 
@@ -90,7 +136,12 @@ function getEmptySpaceCount(gameBoard) {
  * matrix, make the move on the gameBoard and return the gameBoard.
  */
 function makeMove(playerString, moveObject, gameBoard) {
+	var row = gameBoard[moveObject.y];
 
+	row.splice(moveObject.x, 1, playerString);
+	gameBoard.splice(moveObject.y, 1, row);
+
+	return gameBoard;
 }
 
 
@@ -99,6 +150,40 @@ function makeMove(playerString, moveObject, gameBoard) {
  * gameBoard matrix. If there is no winner than the function should return null.
  */
 function getWinner(gameBoard) {
+	var winner;
+	var winnerFound = false;
+	// Test if someone has a full row
+	gameBoard.forEach(function(row, i) {
+		 if (row[0] === row[1] && row[0] === row[2] && row[0] !== ' ') {
+			winner = row[0];
+			winnerFound = true;
+		 }
+	 });
+	 // Test if someone has a full column
+	 if (gameBoard[0][0] !== ' ' && gameBoard[0][0] === gameBoard[1][0] && gameBoard[0][0] === gameBoard[2][0]) {
+		 winner = gameBoard[0][0];
+		 winnerFound = true;
+	 } else if (gameBoard[0][1] !== ' ' && gameBoard[0][1] === gameBoard[1][1] && gameBoard[0][1] === gameBoard[2][1]) {
+		 winner = gameBoard[0][1];
+		 winnerFound = true;
+	 } else if (gameBoard[0][2] !== ' ' && gameBoard[0][2] === gameBoard[1][2] && gameBoard[0][2] === gameBoard[2][2]) {
+		 winner = gameBoard[0][2];
+		 winnerFound = true;
+	 }
+	 // Test if someone has a diagonal win
+	 if (gameBoard[0][0] !== ' ' && gameBoard[0][0] === gameBoard[1][1] && gameBoard[0][0] === gameBoard[2][2]) {
+		 winner = gameBoard[0][0];
+		 winnerFound = true;
+	 } else if (gameBoard[0][2] !== ' ' && gameBoard[0][2] === gameBoard[1][1] && gameBoard[0][2] === gameBoard[2][0]) {
+		 winner = gameBoard[0][2];
+		 winnerFound = true;
+	 }
+
+	 if (winnerFound === true) {
+		 return winner;
+	 } else {
+		 return null;
+	 }
 
 }
 
@@ -124,7 +209,17 @@ function getWinner(gameBoard) {
  * exception.
  */
 function parseMove(moveString) {
-
+	// Check if it's valid
+	if (typeof moveString !== "string" || moveString.length !== 3 || moveString.match(/[a-z]/i) || moveString.indexOf(' ') === -1) {
+		throw 'Invalid input: the move must be in the format "x y"';
+	} else {
+		var moves = moveString.split(' ');
+		var moveObject = {
+    	x: moves[0]-1,
+    	y: moves[1]-1
+    };
+		return moveObject;
+	}
 }
 
 /*
@@ -142,6 +237,13 @@ function parseMove(moveString) {
  * If there are no errors then the function should return the move object.
  */
 function validateMove(moveObject, gameBoard) {
+	if (moveObject.x < 0 || moveObject.y < 0 || moveObject.x > gameBoard[0].length-1 || moveObject.y > gameBoard.length-1) {
+		throw 'Invalid move: the coordinates are outside the game board';
+	} else if (gameBoard[moveObject.y][moveObject.x] !== ' '){
+		throw 'Invalid move: that spot is already taken';
+	} else {
+		return moveObject;
+	}
 
 }
 
@@ -187,6 +289,8 @@ function validateMove(moveObject, gameBoard) {
  * example: { x: 0, y: 0 }.
  */
 function getComputerPlayerMove(player, gameBoard) {
+	console.log('Computer PLAYER: ', player);
+	console.log('gameboard: ', gameBoard);
 	// This code just moves to the next available space instead of using the
 	// algorithm outlined above.
 	for(var y = 0; y < gameBoard.length; y++) {
