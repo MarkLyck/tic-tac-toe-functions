@@ -25,9 +25,6 @@ function validateGameType(gameTypeString) {
 	} else {
 		return false;
 	}
-	// 	// return false;
-	// }
-
 }
 
 /*
@@ -289,19 +286,475 @@ function validateMove(moveObject, gameBoard) {
  * example: { x: 0, y: 0 }.
  */
 function getComputerPlayerMove(player, gameBoard) {
-	console.log('Computer PLAYER: ', player);
-	console.log('gameboard: ', gameBoard);
-	// This code just moves to the next available space instead of using the
-	// algorithm outlined above.
-	for(var y = 0; y < gameBoard.length; y++) {
-		for(var x = 0; x < gameBoard[y].length; x++) {
-			if(gameBoard[y][x] === ' ') {
-				return {x: x, y: y};
+	var opponent;
+	if (player === 'X') {
+		opponent = 'O';
+	} else {
+		opponent = 'X';
+	}
+
+	var moveObject = {
+		x: 0,
+		y: 0
+	};
+	var moveFound = false;
+
+
+
+
+
+
+
+	// 1 WIN!
+	gameBoard.forEach(function(row, i) {
+		if (player === row[0] || player === row[1] || player === row[2]) {
+			// Rows
+			if (row[0] === player && row[1] === player  && row[2] === ' ') { // ROW: XXO
+				moveObject.x = 2;
+				moveObject.y = i;
+				moveFound = true;
+				console.log('Win: 1');
+			} else if (row[0] === ' ' && row[1] === player && row[2] === player) { // ROW OXX
+				moveObject.x = 0;
+				moveObject.y = i;
+				moveFound = true;
+				console.log('Win: 2');
+			} else if (row[0] === player && row[1] === ' ' && row[2] === player) { // ROW XOX
+				moveObject.x = 1;
+				moveObject.y = i;
+				moveFound = true;
+				console.log('Win: 3');
+				// Columns
+			} else if (gameBoard[0][i] === player && gameBoard[1][i] === player && gameBoard[2][i] === ' ') { // COL XXO
+				moveObject.x = i;
+				moveObject.y = 2;
+				moveFound = true;
+				console.log('Win: 4');
+			} else if (gameBoard[0][i] === ' ' && gameBoard[1][i] === player && gameBoard[2][i] === player) { // COL OXX
+				moveObject.x = i;
+				moveObject.y = 0;
+				moveFound = true;
+				console.log('Win: 5');
+			} else if (gameBoard[0][i] === player && gameBoard[1][i] === ' ' && gameBoard[2][i] === player) { // COL XOX
+				moveObject.x = i;
+				moveObject.y = 1;
+				moveFound = true;
+				console.log('Win: 6');
 			}
 		}
+	});
+	if (gameBoard[0][0] === player && gameBoard[1][1] === player && gameBoard[2][2] === ' ') {
+		moveObject.x = 2;
+		moveObject.y = 2;
+		moveFound = true;
+		console.log('Win: 7');
+	} else if (gameBoard[0][0] === ' ' && gameBoard[1][1] === player && gameBoard[2][2] === player) {
+		moveObject.x = 0;
+		moveObject.y = 0;
+		moveFound = true;
+		console.log('Win: 8');
+	} else if (gameBoard[0][0] === player && gameBoard[1][1] === ' ' && gameBoard[2][2] === player) {
+		moveObject.x = 1;
+		moveObject.y = 1;
+		moveFound = true;
+		console.log('Win: 9');
+	} else if (gameBoard[0][2] === player && gameBoard[1][1] === player && gameBoard[2][0] === ' ') {
+		moveObject.x = 0; // - - X
+		moveObject.y = 2; // - X -
+		moveFound = true; // M - -
+		console.log('Win: 10');
+	} else if (gameBoard[0][2] === ' ' && gameBoard[1][1] === player && gameBoard[2][0] === player ) {
+		moveObject.x = 2; // - - |
+		moveObject.y = 0; // - X -
+		moveFound = true; // X - -
+		console.log('Win: 11');
+	} else if (gameBoard[0][2] === player && gameBoard[1][1] === ' ' && gameBoard[2][0] === player ) {
+		moveObject.x = 1;
+		moveObject.y = 1;
+		moveFound = true;
+		console.log('Win: 12');
 	}
-	return null;
+	if (moveFound) {
+		// If we found a winning move, take it!
+		return moveObject;
+	}
+
+
+
+
+
+
+
+
+	// 2 Block winning move
+	gameBoard.forEach(function(row, i) {
+		if (opponent === row[0] || opponent === row[1] || opponent === row[2]) {
+			// Rows
+			if (row[0] === opponent && row[1] === opponent  && row[2] === ' ') { // ROW: XXO
+				moveObject.x = 2; // O O M
+				moveObject.y = i; // O O M
+				moveFound = true; // O O M
+				console.log('blockWin: 1');
+			} else if (row[0] === ' ' && row[1] === opponent && row[2] === opponent) { // ROW OXX
+				moveObject.x = 0; // M O O
+				moveObject.y = i; // M O O
+				moveFound = true; // M O O
+				console.log('blockWin: 2');
+			} else if (row[0] === opponent && row[1] === ' ' && row[2] === opponent) { // ROW XOX
+				moveObject.x = 1; // O M O
+				moveObject.y = i; // O M O
+				moveFound = true; // O M O
+				console.log('blockWin: 3');
+				// Columns
+			} else if (gameBoard[0][i] === opponent && gameBoard[1][i] === opponent && gameBoard[2][i] === ' ') { // COL XXO
+				moveObject.x = i; // O O O
+				moveObject.y = 2; // O O O
+				moveFound = true; // M M M
+				console.log('blockWin: 4');
+			} else if (gameBoard[0][i] === ' ' && gameBoard[1][i] === opponent && gameBoard[2][i] === opponent) { // COL OXX
+				moveObject.x = i; // M M M
+				moveObject.y = 0; // O O O
+				moveFound = true; // O O O
+				console.log('blockWin: 5');
+			} else if (gameBoard[0][i] === opponent && gameBoard[1][i] === ' ' && gameBoard[2][i] === opponent) { // COL XOX
+				moveObject.x = i; // O O O
+				moveObject.y = 1; // M M M
+				moveFound = true; // O O O
+				console.log('blockWin: 6');
+			}
+		}
+	});
+	if (gameBoard[0][0] === opponent && gameBoard[1][1] === opponent && gameBoard[2][2] === ' ') {
+		moveObject.x = 2; // O - -
+		moveObject.y = 2; // - O -
+		moveFound = true; // - - M
+		console.log('blockWin: 7');
+	} else if (gameBoard[0][0] === ' ' && gameBoard[1][1] === opponent && gameBoard[2][2] === opponent) {
+		moveObject.x = 0; // M - -
+		moveObject.y = 0; // - O -
+		moveFound = true; // - - O
+		console.log('blockWin: 8');
+	} else if (gameBoard[0][0] === opponent && gameBoard[1][1] === ' ' && gameBoard[2][2] === opponent) {
+		moveObject.x = 1; // O - -
+		moveObject.y = 1; // - M -
+		moveFound = true; // - - O
+		console.log('blockWin: 9');
+	} else if (gameBoard[0][2] === opponent && gameBoard[1][1] === opponent && gameBoard[2][0] === ' ') {
+		moveObject.x = 2; // - - O
+		moveObject.y = 0; // - O -
+		moveFound = true; // M - -
+		console.log('blockWin: 10');
+	} else if (gameBoard[0][2] === ' ' && gameBoard[1][1] === opponent && gameBoard[2][0] === opponent ) {
+		moveObject.x = 0; // - - M
+		moveObject.y = 2; // - O -
+		moveFound = true; // O - -
+		console.log('blockWin: 11');
+	} else if (gameBoard[0][2] === opponent && gameBoard[1][1] === ' ' && gameBoard[2][0] === opponent ) {
+		moveObject.x = 1; // - - O
+		moveObject.y = 1; // - M -
+		moveFound = true; // O - -
+		console.log('blockWin: 12');
+	}
+	if (moveFound) {
+		// If we found a blocking move: take it!
+		return moveObject;
+	}
+
+
+	// 3 Fork
+	if (gameBoard[0][1] === player && gameBoard[1][1] === ' '  && gameBoard[1][0] === player && gameBoard[1][2] === ' ' && gameBoard[2][1] === ' ') {
+		moveObject.x = 1; // - X -
+		moveObject.y = 1; // X M |
+		moveFound = true; // - | -
+		console.log('Fork0: 1');
+	} else if (gameBoard[0][1] === player && gameBoard[1][1] === ' '  && gameBoard[1][2] === player && gameBoard[1][0] === ' ' && gameBoard[2][1] === ' ') {
+		moveObject.x = 1; // - X -
+		moveObject.y = 1; // | M X
+		moveFound = true; // - | -
+		console.log('Fork0: 2');
+	} else if (gameBoard[0][1] === ' ' && gameBoard[1][1] === ' '  && gameBoard[1][2] === player && gameBoard[1][0] === ' ' && gameBoard[2][1] === player) {
+		moveObject.x = 1; // - | -
+		moveObject.y = 1; // | M X
+		moveFound = true; // - X -
+		console.log('Fork0: 3');
+	} else if (gameBoard[0][1] === ' ' && gameBoard[1][1] === ' '  && gameBoard[1][2] === ' ' && gameBoard[1][0] === player && gameBoard[2][1] === player) {
+		moveObject.x = 1; // - | -
+		moveObject.y = 1; // X M |
+		moveFound = true; // - X -
+		console.log('Fork0: 4');
+
+		// New fork type
+	} else if (gameBoard[0][1] === player && gameBoard[0][2] === ' '  && gameBoard[1][2] === player && gameBoard[0][0] === ' ' && gameBoard[2][2] === ' ') {
+		moveObject.x = 2; // | X M
+		moveObject.y = 0; // - - X
+		moveFound = true; // - - |
+		console.log('Fork1: 1');
+	} else if (gameBoard[1][2] === player && gameBoard[2][2] === ' '  && gameBoard[2][1] === player && gameBoard[0][2] === ' ' && gameBoard[2][0] === ' ') {
+		moveObject.x = 2; // - - |
+		moveObject.y = 0; // - - X
+		moveFound = true; // | X M
+		console.log('Fork1: 2');
+	} else if (gameBoard[1][0] === player && gameBoard[2][0] === ' '  && gameBoard[2][1] === player && gameBoard[0][0] === ' ' && gameBoard[2][2] === ' ') {
+		moveObject.x = 2; // | - -
+		moveObject.y = 0; // X - -
+		moveFound = true; // M X |
+		console.log('Fork1: 3');
+	} else if (gameBoard[1][0] === player && gameBoard[0][0] === ' '  && gameBoard[0][1] === player && gameBoard[0][2] === ' ' && gameBoard[2][0] === ' ') {
+		moveObject.x = 2; // M X |
+		moveObject.y = 0; // X - -
+		moveFound = true; // | - -
+		console.log('Fork1: 4');
+
+	// New fork type
+	} else if (gameBoard[1][1] === player && gameBoard[2][1] === player  && gameBoard[2][2] === ' ' && gameBoard[0][0] === ' ' && gameBoard[2][0] === ' ') {
+			moveObject.x = 2; // | O -
+			moveObject.y = 2; // - X -
+			moveFound = true; // | X M
+			console.log('Fork2: 1');
+	} else if (gameBoard[1][1] === player && gameBoard[2][1] === player  && gameBoard[2][2] === ' ' && gameBoard[0][2] === ' ' && gameBoard[2][0] === ' ') {
+				moveObject.x = 0; // - O |
+				moveObject.y = 2; // - X -
+				moveFound = true; // M X |
+				console.log('Fork2: 2');
+	} else if (gameBoard[1][1] === player && gameBoard[1][0] === player  && gameBoard[0][2] === ' ' && gameBoard[0][0] === ' ' && gameBoard[2][0] === ' ') {
+				moveObject.x = 0; // | - |
+				moveObject.y = 2; // X X O
+				moveFound = true; // M - -
+				console.log('Fork2: 3');
+	} else if (gameBoard[1][1] === player && gameBoard[1][0] === player  && gameBoard[2][2] === ' ' && gameBoard[2][0] === ' ' && gameBoard[0][0] === ' ') {
+				moveObject.x = 0; // M - -
+				moveObject.y = 0; // X X O
+				moveFound = true; // | - |
+				console.log('Fork2: 4');
+	} else if (gameBoard[1][1] === player && gameBoard[0][1] === player  && gameBoard[2][2] === ' ' && gameBoard[0][2] === ' ' && gameBoard[0][0] === ' ') {
+				moveObject.x = 0; // M X |
+				moveObject.y = 0; // - X -
+				moveFound = true; // - O |
+				console.log('Fork2: 5');
+	} else if (gameBoard[1][1] === player && gameBoard[0][1] === player  && gameBoard[0][0] === ' ' && gameBoard[2][0] === ' ' && gameBoard[0][2] === ' ') {
+				moveObject.x = 2; // | X M
+				moveObject.y = 0; // - X -
+				moveFound = true; // | O -
+				console.log('Fork2: 6');
+	} else if (gameBoard[1][1] === player && gameBoard[1][2] === player  && gameBoard[2][0] === ' ' && gameBoard[2][2] === ' ' && gameBoard[0][2] === ' ') {
+				moveObject.x = 2; // - - M
+				moveObject.y = 0; // O X X
+				moveFound = true; // | - |
+				console.log('Fork2: 7');
+	} else if (gameBoard[1][1] === player && gameBoard[1][2] === player  && gameBoard[0][0] === ' ' && gameBoard[0][2] === ' ' && gameBoard[2][2] === ' ') {
+				moveObject.x = 2; // | - |
+				moveObject.y = 2; // O X X
+				moveFound = true; // - - M
+				console.log('Fork2: 8');
+
+
+
+	// New fork type
+} else if (gameBoard[0][0] === ' ' && gameBoard[1][1] === player && gameBoard[2][0] === player && gameBoard[2][2] === ' ' && gameBoard[2][1] === ' ') {
+					moveObject.x = 2; // | - O
+					moveObject.y = 2; // - X -
+					moveFound = true; // X | M
+					console.log('Fork3: 1');
+	} else if (gameBoard[0][2] === ' ' && gameBoard[1][1] === player && gameBoard[2][0] === ' ' && gameBoard[2][2] === player && gameBoard[2][1] === ' ') {
+					moveObject.x = 0; // O - |
+					moveObject.y = 2; // - X -
+					moveFound = true; // M | X
+					console.log('Fork3: 2');
+	} else if (gameBoard[0][0] === player && gameBoard[1][1] === player && gameBoard[2][0] === ' ' && gameBoard[0][2] === ' ' && gameBoard[1][0] === ' ') {
+					moveObject.x = 0; // X - |
+					moveObject.y = 2; // | X -
+					moveFound = true; // M - -
+					console.log('Fork3: 3');
+	} else if (gameBoard[0][0] === ' ' && gameBoard[1][1] === player && gameBoard[2][0] === player && gameBoard[2][2] === ' ' && gameBoard[1][0] === ' ') {
+					moveObject.x = 0; // M - -
+					moveObject.y = 0; // | X -
+					moveFound = true; // X - |
+					console.log('Fork3: 4');
+	} else if (gameBoard[0][0] === ' ' && gameBoard[1][1] === player && gameBoard[0][2] === player && gameBoard[2][2] === ' ' && gameBoard[0][1] === ' ') {
+					moveObject.x = 0; // M | X
+					moveObject.y = 0; // - X -
+					moveFound = true; // - - |
+					console.log('Fork3: 5');
+	} else if (gameBoard[0][0] === player && gameBoard[1][1] === player && gameBoard[0][2] === ' ' && gameBoard[2][0] === ' ' && gameBoard[0][1] === ' ') {
+					moveObject.x = 2; // X | M
+					moveObject.y = 0; // - X -
+					moveFound = true; // | - -
+					console.log('Fork3: 6');
+	} else if (gameBoard[0][2] === ' ' && gameBoard[1][1] === player && gameBoard[2][2] === player && gameBoard[1][2] === ' ' && gameBoard[2][0] === ' ') {
+					moveObject.x = 2; // - - M
+					moveObject.y = 0; // - X |
+					moveFound = true; // | - X
+					console.log('Fork3: 7');
+	} else if (gameBoard[0][2] === player && gameBoard[1][1] === player && gameBoard[2][2] === ' ' && gameBoard[0][0] === ' ' && gameBoard[1][2] === ' ') {
+					moveObject.x = 2; // | - X
+					moveObject.y = 2; // - X |
+					moveFound = true; // - - M
+					console.log('Fork3: 8');
+	}
+
+	if (moveFound) {
+		// If we found a FORK move
+		return moveObject;
+	}
+
+	// 4 Block opponents fork by setting up a win.
+	gameBoard.forEach(function(row, i) {
+		if (player === row[0] || player === row[1] || player === row[2]) {
+			// Rows
+			if (row[0] === player && row[1] === ' '  && row[2] === ' ') {
+				moveObject.x = 2; // X | M
+				moveObject.y = i; // X | M
+				moveFound = true; // X | M
+				console.log('Set up for win: 1');
+			} else if (row[0] === ' ' && row[1] === ' ' && row[2] ===  player) {
+				moveObject.x = 0; // M | X
+				moveObject.y = i; // M | X
+				moveFound = true; // M | X
+				console.log('Set up for win: 2');
+			} else if (gameBoard[0][i] === player && gameBoard[1][i] === ' ' && gameBoard[2][i] === ' ') {
+				moveObject.x = i; // X - -
+				moveObject.y = 2; // | - -
+				moveFound = true; // M - -
+				console.log('Set up for win: 3');
+			} else if (gameBoard[0][i] === ' ' && gameBoard[1][i] === ' ' && gameBoard[2][i] === player) {
+				moveObject.x = i; // M - -
+				moveObject.y = 2; // | - -
+				moveFound = true; // X - -
+				console.log('Set up for win: 4');
+			} else if (gameBoard[0][0] === player && gameBoard[1][1] === ' ' && gameBoard[2][2] === ' ') {
+				moveObject.x = 2; // X - -
+				moveObject.y = 2; // - | -
+				moveFound = true; // - - M
+				console.log('Set up for win: 5');
+			} else if (gameBoard[0][0] === ' ' && gameBoard[1][1] === ' ' && gameBoard[2][2] === player) {
+				moveObject.x = 0; // M - -
+				moveObject.y = 0; // - | -
+				moveFound = true; // - - X
+				console.log('Set up for win: 6');
+			}	else if (gameBoard[2][0] === player && gameBoard[1][1] === ' ' && gameBoard[0][2] === ' ') {
+			 moveObject.x = 2; // - - M
+			 moveObject.y = 0; // - | -
+			 moveFound = true; // X - -
+			 console.log('Set up for win: 1');
+		  }	else if (gameBoard[2][0] === ' ' && gameBoard[1][1] === ' ' && gameBoard[0][2] === player) {
+				moveObject.x = 0; // - - X
+				moveObject.y = 2; // - | -
+				moveFound = true; // M - -
+				console.log('Set up for win: 8');
+			}
+		}
+	});
+
+	// 7. Middle
+	if (gameBoard[1][1] === ' ') {
+				moveObject.x = 1; // - - -
+				moveObject.y = 1; // - M -
+				moveFound = true; // - - -
+				console.log('Middle');
+	}
+	if (moveFound) {
+		// If we found an Empty Corner
+		return moveObject;
+	}
+
+	// 8 Opposite Corner
+	if (gameBoard[0][2] === ' ' && gameBoard[2][0] === opponent) {
+				moveObject.x = 2; // - - M
+				moveObject.y = 0; // - - -
+				moveFound = true; // O - -
+				console.log('Opposite corner: 1');
+	} else if (gameBoard[2][2] === ' ' && gameBoard[0][0] === opponent) {
+				moveObject.x = 2; // O - -
+				moveObject.y = 2; // - - -
+				moveFound = true; // - - M
+				console.log('Opposite corner: 2');
+	} else if (gameBoard[2][0] === ' ' && gameBoard[0][2] === opponent) {
+				moveObject.x = 2; // - - O
+				moveObject.y = 0; // - - -
+				moveFound = true; // M - -
+				console.log('Opposite corner: 3');
+	} else if (gameBoard[0][0] === ' ' && gameBoard[2][2] === opponent) {
+				moveObject.x = 0; // M - -
+				moveObject.y = 0; // - - -
+				moveFound = true; // - - O
+			  console.log('Opposite corner: 4');
+	}
+	if (moveFound) {
+		// If we found an Empty Corner
+		return moveObject;
+	}
+
+
+	// 9 Empty Corner
+	if (gameBoard[0][2] === ' ') {
+				moveObject.x = 2; // - - M
+				moveObject.y = 0; // - - -
+				moveFound = true; // - - -
+				console.log('empty corner: 1');
+	} else if (gameBoard[2][2] === ' ') {
+				moveObject.x = 2; // - - -
+				moveObject.y = 2; // - - -
+				moveFound = true; // - - M
+				console.log('empty corner: 2');
+	} else if (gameBoard[2][0] === ' ') {
+				moveObject.x = 0; // - - -
+				moveObject.y = 2; // - - -
+				moveFound = true; // M - -
+				console.log('empty corner: 3');
+	} else if (gameBoard[0][0] === ' ') {
+				moveObject.x = 0; // M - -
+				moveObject.y = 0; // - - -
+				moveFound = true; // - - -
+				console.log('empty corner: 4');
+	}
+	if (moveFound) {
+		// If we found an Empty Corner
+		return moveObject;
+	}
+
+
+
+
+
+
+	// 10. Side
+	if (gameBoard[0][1] === ' ') {
+				moveObject.x = 1; // - M -
+				moveObject.y = 0; // - - -
+				moveFound = true; // - - -
+				console.log('empty side: 1');
+	} else if (gameBoard[1][2] === ' ') {
+				moveObject.x = 2; // - - -
+				moveObject.y = 1; // - - M
+				moveFound = true; // - - -
+				console.log('empty side: 2');
+	} else if (gameBoard[2][1] === ' ') {
+				moveObject.x = 1; // - - -
+				moveObject.y = 2; // - - -
+				moveFound = true; // - M -
+				console.log('empty side: 3');
+	} else if (gameBoard[1][0] === ' ') {
+				moveObject.x = 0; // - - -
+				moveObject.y = 1; // M - -
+				moveFound = true; // - - -
+				console.log('empty side: 4');
+	}
+
+	 return moveObject;
 }
+
+
+// 	// This code just moves to the next available space instead of using the
+// 	// algorithm outlined above.
+// 	for(var y = 0; y < gameBoard.length; y++) {
+// 		for(var x = 0; x < gameBoard[y].length; x++) {
+// 			if(gameBoard[y][x] === ' ') {
+// 				return {x: x, y: y};
+// 			}
+// 		}
+// 	}
+// 	return null;
+// }
 
 /* ============================================================================
 															Don't mess with this code :)
